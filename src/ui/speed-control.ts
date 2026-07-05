@@ -8,13 +8,13 @@ import { SPEECH_RATE_OPTIONS } from '../types';
 
 export function speedControlMarkup(currentRate: number): string {
   return `
-    <div class="lsn-speed-control">
-      <span class="lsn-speed-label">Speed</span>
-      <div class="lsn-speed-group" role="group" aria-label="Playback speed">
+    <div class="lsn-segmented-row">
+      <span class="lsn-segmented-label">Speed</span>
+      <div class="lsn-segmented" role="group" aria-label="Playback speed">
         ${SPEECH_RATE_OPTIONS.map((option) => `
           <button
             type="button"
-            class="lsn-speed-btn ${option.value === currentRate ? 'lsn-speed-btn-active' : ''}"
+            class="lsn-segmented-btn ${option.value === currentRate ? 'lsn-segmented-btn-active' : ''}"
             data-speed="${option.value}"
           >${option.label}</button>
         `).join('')}
@@ -31,7 +31,7 @@ export function bindSpeedControl(container: HTMLElement, app: App) {
       if (!Number.isFinite(rate)) return;
       app.settings.speechRate = rate;
       app.saveSettings();
-      buttons.forEach((b) => b.classList.toggle('lsn-speed-btn-active', b === btn));
+      buttons.forEach((b) => b.classList.toggle('lsn-segmented-btn-active', b === btn));
     });
   });
 }

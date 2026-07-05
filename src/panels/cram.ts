@@ -35,6 +35,25 @@ export class CramPanel {
       return;
     }
 
+    const shareParams = this.app.consumeShareParams();
+    if (shareParams) {
+      const ranges = shareParams.get('ranges');
+      const shuffled = shareParams.get('shuffle') === '1';
+      if (ranges) {
+        this.app.cramSetupIsShuffled = shuffled;
+        this.app.settings.lastCramRanges = ranges;
+        const validation = this.app.validateCustomRanges(ranges);
+        if (validation.valid && validation.numbers?.length) {
+          this.app.rememberCramConfig(ranges, shuffled);
+          this.app.saveSettings();
+          this.session = buildCramSession(validation.numbers, shuffled, this.app.shuffleArray.bind(this.app));
+          this.showCard();
+          return;
+        }
+        toast(validation.error || 'That drill link has invalid ranges');
+      }
+    }
+
     this.showSetup();
   }
 
@@ -53,6 +72,7 @@ export class CramPanel {
   }
 
   private showSetup() {
+    this.app.setKeyHandler(null);
     const lastRanges = this.app.settings.lastCramRanges || '1-20';
     const recentConfigs = this.app.settings.cramRecentConfigs ?? [];
     let isShuffled = this.app.cramSetupIsShuffled;
@@ -94,7 +114,9 @@ export class CramPanel {
           <button id="btn-start" class="lsn-btn-start lsn-mt-16">Start Flashcards</button>
         </div>
         <div class="lsn-footer-actions">
-          <div class="lsn-footer-actions-left"></div>
+          <div class="lsn-footer-actions-left">
+            <button id="copy-link" class="lsn-home-btn-text">${iconWithLabel(APP_ICONS.link, 'Copy Link')}</button>
+          </div>
           <button id="btn-home" class="lsn-home-btn-text" aria-label="Home">${iconOnly(APP_ICONS.home)}</button>
         </div>
       </div>
@@ -155,6 +177,21 @@ export class CramPanel {
 
     this.container.querySelector('#btn-home')?.addEventListener('click', () => {
       this.app.navigate('home');
+    });
+
+    this.container.querySelector('#copy-link')?.addEventListener('click', async () => {
+      const ranges = rangesEl.value.trim();
+      if (!ranges) {
+        toast('Enter number ranges first');
+        return;
+      }
+      const url = this.app.buildShareUrl('cram', { ranges, shuffle: isShuffled ? '1' : '0' });
+      try {
+        await navigator.clipboard.writeText(url);
+        toast('Link copied!');
+      } catch {
+        toast('Could not copy link');
+      }
     });
 
     this.container.querySelector('#btn-start')?.addEventListener('click', () => {
@@ -234,6 +271,8 @@ export class CramPanel {
 
         ${speedControlMarkup(this.app.settings.speechRate)}
 
+        <div class="lsn-kbd-hint">Space: show / good &nbsp;·&nbsp; 1: again &nbsp;·&nbsp; 2: good &nbsp;·&nbsp; R: replay</div>
+
         <div class="lsn-footer-actions">
           <div class="lsn-footer-actions-left">
             <button id="btn-back" class="lsn-home-btn-text">${iconWithLabel(APP_ICONS.back, 'Back')}</button>
@@ -290,9 +329,35 @@ export class CramPanel {
       this.app.cramSession = null;
       this.app.navigate('home');
     });
+
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.repeat) return;
+      const reviewActions = this.container.querySelector('#review-actions');
+      const answerVisible = !!reviewActions && !reviewActions.classList.contains('lsn-hidden');
+
+      if (e.key === ' ' || e.code === 'Space') {
+        e.preventDefault();
+        const buttonId = answerVisible ? '#btn-good' : '#btn-show';
+        (this.container.querySelector(buttonId) as HTMLButtonElement | null)?.click();
+        return;
+      }
+      if (e.key === '1' && answerVisible) {
+        (this.container.querySelector('#btn-again') as HTMLButtonElement | null)?.click();
+        return;
+      }
+      if (e.key === '2' && answerVisible) {
+        (this.container.querySelector('#btn-good') as HTMLButtonElement | null)?.click();
+        return;
+      }
+      if (e.key.toLowerCase() === 'r') {
+        (this.container.querySelector('#btn-play-a') as HTMLButtonElement | null)?.click();
+      }
+    };
+    this.app.setKeyHandler(handleKey);
   }
 
   private showComplete() {
+    this.app.setKeyHandler(null);
     this.container.innerHTML = `
       <div class="lsn-wrap lsn-text-center">
         <div class="lsn-celebration">🎉</div>

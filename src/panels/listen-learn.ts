@@ -34,11 +34,45 @@ export class ListenLearnPanel {
       this.app.listenLearnCleanup = null;
     }
 
-    if (state.numbers.length === 0) {
-      this.renderSetup();
-    } else {
+    if (state.numbers.length > 0) {
       this.renderSlideshow();
+      return;
     }
+
+    const shareParams = this.app.consumeShareParams();
+    if (shareParams) {
+      const ranges = shareParams.get('ranges');
+      if (ranges) {
+        const direction = shareParams.get('direction');
+        const validDirections: Array<typeof state.direction> = ['es-en', 'en-es', 'es-only'];
+        const dir = (validDirections as string[]).includes(direction ?? '') ? (direction as typeof state.direction) : state.direction;
+        const shuffled = shareParams.get('shuffle') === '1';
+
+        state.inputText = ranges;
+        state.direction = dir;
+        state.shuffled = shuffled;
+
+        const validation = this.app.validateCustomRanges(ranges);
+        if (validation.valid && validation.numbers?.length) {
+          state.numbers = shuffled ? this.app.shuffleArray(validation.numbers) : validation.numbers;
+          state.currentIndex = 0;
+          state.showingAnswer = false;
+          this.app.rememberListenLearnConfig(ranges, dir, shuffled);
+          this.app.settings.listenLearnSettings = {
+            ...this.app.settings.listenLearnSettings,
+            direction: dir,
+            inputText: ranges,
+            shuffled,
+          };
+          this.app.saveSettings();
+          this.renderSlideshow();
+          return;
+        }
+        toast(validation.error || 'That drill link has invalid ranges');
+      }
+    }
+
+    this.renderSetup();
   }
 
   private getDirectionLabel(direction: 'es-en' | 'en-es' | 'es-only') {
@@ -119,6 +153,12 @@ export class ListenLearnPanel {
 
           <button id="start" class="lsn-btn-start lsn-listen-start">Start Listening</button>
         </div>
+
+        <div class="lsn-footer-actions">
+          <div class="lsn-footer-actions-left">
+            <button id="copy-link" class="lsn-home-btn-text">${iconWithLabel(APP_ICONS.link, 'Copy Link')}</button>
+          </div>
+        </div>
       </div>
     `;
 
@@ -161,6 +201,25 @@ export class ListenLearnPanel {
 
     this.container.querySelector('#btn-home')?.addEventListener('click', () => {
       this.app.navigate('home');
+    });
+
+    this.container.querySelector('#copy-link')?.addEventListener('click', async () => {
+      const ranges = rangesEl.value.trim();
+      if (!ranges) {
+        toast('Enter number ranges first');
+        return;
+      }
+      const url = this.app.buildShareUrl('listen-learn', {
+        ranges,
+        direction: state.direction,
+        shuffle: state.shuffled ? '1' : '0',
+      });
+      try {
+        await navigator.clipboard.writeText(url);
+        toast('Link copied!');
+      } catch {
+        toast('Could not copy link');
+      }
     });
 
     this.container.querySelector('#order-seq')?.addEventListener('click', () => {

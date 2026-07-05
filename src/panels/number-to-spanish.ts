@@ -1,15 +1,18 @@
-// Number to Spanish Panel - Convert numbers to Spanish
+// Number to Spanish Panel - Convert numbers to Spanish, cardinal or ordinal
 
 import { App } from '../app';
 import { APP_ICONS, iconOnly } from '../ui/icons';
 import { toast } from '../ui/toast';
 import { bindSpeedControl, speedControlMarkup } from '../ui/speed-control';
-import { getSpanishNumberBreakdown, numberToSpanish } from '../utils/numbers';
+import { getSpanishNumberBreakdown, MAX_ORDINAL, numberToSpanish, numberToSpanishOrdinal } from '../utils/numbers';
+
+type NumberType = 'cardinal' | 'ordinal';
 
 export class NumberToSpanishPanel {
   private app: App;
   private container: HTMLElement;
   private currentSpanishText: string = '';
+  private numberType: NumberType = 'cardinal';
 
   constructor(app: App, container: HTMLElement) {
     this.app = app;
@@ -51,6 +54,15 @@ export class NumberToSpanishPanel {
     const breakdownEl = this.container.querySelector('#number-breakdown') as HTMLElement | null;
     if (!breakdownEl) return;
 
+    // Ordinals aren't built from the same scale-by-scale decomposition as
+    // cardinals (e.g. "vigésimo primero" isn't "veinte" + "uno"), so the
+    // breakdown only makes sense for cardinal numbers.
+    if (this.numberType === 'ordinal') {
+      breakdownEl.innerHTML = '';
+      breakdownEl.classList.add('lsn-number-breakdown-pending');
+      return;
+    }
+
     const parts = getSpanishNumberBreakdown(num);
     breakdownEl.classList.remove('lsn-number-breakdown-pending');
     breakdownEl.innerHTML = `
@@ -69,6 +81,12 @@ export class NumberToSpanishPanel {
     `;
   }
 
+  private validationMessage(): string {
+    return this.numberType === 'ordinal'
+      ? `Enter a valid number (1-${MAX_ORDINAL})`
+      : 'Enter a valid number (0-1 trillion)';
+  }
+
   private convertNumberToSpanish(numStr: string): boolean {
     if (!numStr || !/^\d+$/.test(numStr)) {
       this.clearSpanishResult();
@@ -81,6 +99,21 @@ export class NumberToSpanishPanel {
     } catch {
       this.clearSpanishResult();
       return false;
+    }
+
+    if (this.numberType === 'ordinal') {
+      if (num < BigInt(1) || num > BigInt(MAX_ORDINAL)) {
+        this.clearSpanishResult();
+        return false;
+      }
+      const ordinal = numberToSpanishOrdinal(Number(num));
+      if (!ordinal) {
+        this.clearSpanishResult();
+        return false;
+      }
+      this.setSpanishResult(ordinal);
+      this.renderBreakdown(Number(num));
+      return true;
     }
 
     if (num < BigInt(0) || num > BigInt('1000000000000')) {
@@ -100,6 +133,12 @@ export class NumberToSpanishPanel {
       <div class="lsn-wrap">
         <h2 class="lsn-title-lg lsn-mb-24">Number to Spanish</h2>
         <div class="lsn-card-sm" style="overflow-wrap:break-word;">
+          <div class="lsn-segmented-row" style="margin-top:0;">
+            <div class="lsn-segmented" role="group" aria-label="Number type">
+              <button type="button" id="type-cardinal" class="lsn-segmented-btn lsn-segmented-btn-active" data-type="cardinal">Cardinal</button>
+              <button type="button" id="type-ordinal" class="lsn-segmented-btn" data-type="ordinal">Ordinal</button>
+            </div>
+          </div>
           <div class="lsn-mb-12">
             <label class="lsn-label">Number:</label>
             <input id="num-input" type="text" inputmode="numeric" placeholder="Enter a number (0-1 trillion)" class="lsn-input lsn-input-lg">
@@ -123,6 +162,8 @@ export class NumberToSpanishPanel {
     `;
 
     const inputEl = this.container.querySelector('#num-input') as HTMLInputElement;
+    const cardinalBtn = this.container.querySelector('#type-cardinal') as HTMLButtonElement;
+    const ordinalBtn = this.container.querySelector('#type-ordinal') as HTMLButtonElement;
 
     bindSpeedControl(this.container, this.app);
 
@@ -130,9 +171,20 @@ export class NumberToSpanishPanel {
       this.app.navigate('home');
     });
 
+    const setType = (type: NumberType) => {
+      this.numberType = type;
+      cardinalBtn.classList.toggle('lsn-segmented-btn-active', type === 'cardinal');
+      ordinalBtn.classList.toggle('lsn-segmented-btn-active', type === 'ordinal');
+      inputEl.placeholder = type === 'ordinal' ? `Enter a number (1-${MAX_ORDINAL})` : 'Enter a number (0-1 trillion)';
+      this.convertNumberToSpanish(inputEl.value.trim());
+    };
+
+    cardinalBtn.addEventListener('click', () => setType('cardinal'));
+    ordinalBtn.addEventListener('click', () => setType('ordinal'));
+
     const playCurrentSpanish = () => {
       if (!this.currentSpanishText) {
-        toast('Enter a valid number (0-1 trillion)');
+        toast(this.validationMessage());
         return;
       }
       this.app.playAudio(this.currentSpanishText, undefined, true);
@@ -141,7 +193,7 @@ export class NumberToSpanishPanel {
     const handlePlaySpanish = () => {
       const numStr = inputEl.value.trim();
       if (!this.convertNumberToSpanish(numStr)) {
-        toast('Enter a valid number (0-1 trillion)');
+        toast(this.validationMessage());
         return;
       }
       playCurrentSpanish();

@@ -20,13 +20,13 @@ import { NumberToSpanishPanel } from './panels/number-to-spanish';
 import { SettingsPanel } from './panels/settings';
 
 const STORAGE_KEY = 'spanish-learn-numbers';
+const KNOWN_PANELS: PanelId[] = ['cram', 'listen-learn', 'number-to-spanish', 'settings'];
 
-function parseHash(hash: string): PanelId {
-  const value = hash.replace(/^#\/?/, '');
-  if (value === 'cram' || value === 'listen-learn' || value === 'number-to-spanish' || value === 'settings') {
-    return value;
-  }
-  return 'home';
+function parseHash(hash: string): { panel: PanelId; params: URLSearchParams } {
+  const raw = hash.replace(/^#\/?/, '');
+  const [panelPart, queryPart] = raw.split('?');
+  const panel = (KNOWN_PANELS as string[]).includes(panelPart) ? (panelPart as PanelId) : 'home';
+  return { panel, params: new URLSearchParams(queryPart ?? '') };
 }
 
 export class App {
@@ -36,6 +36,8 @@ export class App {
   cramSetupIsShuffled = false;
   listenLearnState: ListenLearnState;
   listenLearnCleanup: (() => void) | null = null;
+  private pendingShareParams: URLSearchParams | null = null;
+  private activeKeyHandler: ((e: KeyboardEvent) => void) | null = null;
   private root: HTMLElement;
 
   constructor(root: HTMLElement) {
@@ -56,11 +58,15 @@ export class App {
     warmUpVoices();
 
     window.addEventListener('hashchange', () => {
-      this.currentPanel = parseHash(location.hash);
+      const { panel, params } = parseHash(location.hash);
+      this.currentPanel = panel;
+      this.pendingShareParams = params.toString() ? params : null;
       this.render();
     });
 
-    this.currentPanel = parseHash(location.hash);
+    const initial = parseHash(location.hash);
+    this.currentPanel = initial.panel;
+    this.pendingShareParams = initial.params.toString() ? initial.params : null;
     this.render();
   }
 
@@ -105,16 +111,44 @@ export class App {
 
   navigate(panel: PanelId) {
     const hash = panel === 'home' ? '' : `#${panel}`;
-    if (parseHash(location.hash) === panel) {
+    if (parseHash(location.hash).panel === panel) {
       this.currentPanel = panel;
+      this.pendingShareParams = null;
       this.render();
     } else if (panel === 'home') {
       // Avoid leaving a dangling '#' in the URL.
       history.pushState(null, '', location.pathname + location.search);
       this.currentPanel = 'home';
+      this.pendingShareParams = null;
       this.render();
     } else {
       location.hash = hash;
+    }
+  }
+
+  /**
+   * Returns the query params from a shared drill link (e.g. #cram?ranges=1-20&shuffle=1)
+   * exactly once — subsequent internal re-renders (Back, Start Over) get null.
+   */
+  consumeShareParams(): URLSearchParams | null {
+    const params = this.pendingShareParams;
+    this.pendingShareParams = null;
+    return params;
+  }
+
+  buildShareUrl(panel: PanelId, params: Record<string, string>): string {
+    const query = new URLSearchParams(params).toString();
+    return `${location.origin}${location.pathname}#${panel}?${query}`;
+  }
+
+  /** Registers the sole active keydown handler, replacing whatever page owned it before. */
+  setKeyHandler(handler: ((e: KeyboardEvent) => void) | null) {
+    if (this.activeKeyHandler) {
+      window.removeEventListener('keydown', this.activeKeyHandler);
+    }
+    this.activeKeyHandler = handler;
+    if (handler) {
+      window.addEventListener('keydown', handler);
     }
   }
 
@@ -123,6 +157,7 @@ export class App {
       this.listenLearnCleanup();
       this.listenLearnCleanup = null;
     }
+    this.setKeyHandler(null);
     this.stopAudio();
 
     this.root.innerHTML = '';

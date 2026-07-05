@@ -110,6 +110,56 @@ export function getSpanishNumberBreakdown(num: number): SpanishNumberBreakdownPa
   return parts;
 }
 
+// Ordinal numbers are capped at 999: beyond that, Spanish ordinals become
+// archaic and rare (even in formal writing people fall back to cardinal
+// numbers, "el número 1500", rather than "milquingentésimo"), so producing
+// them would risk teaching constructions no one actually uses.
+export const MAX_ORDINAL = 999;
+
+const ORDINAL_UNITS = ['', 'primero', 'segundo', 'tercero', 'cuarto', 'quinto', 'sexto', 'séptimo', 'octavo', 'noveno'];
+
+const ORDINAL_TENS: Record<number, string> = {
+  10: 'décimo',
+  20: 'vigésimo',
+  30: 'trigésimo',
+  40: 'cuadragésimo',
+  50: 'quincuagésimo',
+  60: 'sexagésimo',
+  70: 'septuagésimo',
+  80: 'octogésimo',
+  90: 'nonagésimo',
+};
+
+const ORDINAL_HUNDREDS: Record<number, string> = {
+  100: 'centésimo',
+  200: 'ducentésimo',
+  300: 'tricentésimo',
+  400: 'cuadringentésimo',
+  500: 'quingentésimo',
+  600: 'sexcentésimo',
+  700: 'septingentésimo',
+  800: 'octingentésimo',
+  900: 'noningentésimo',
+};
+
+function ordinalUnderHundred(num: number): string {
+  if (num <= 9) return ORDINAL_UNITS[num] ?? '';
+  if (num % 10 === 0) return ORDINAL_TENS[num] ?? '';
+  const tens = Math.floor(num / 10) * 10;
+  const units = num % 10;
+  return `${ORDINAL_TENS[tens] ?? ''} ${ORDINAL_UNITS[units]}`;
+}
+
+/** Spanish ordinal (1st-999th), masculine singular standalone form, e.g. 21 -> "vigésimo primero". */
+export function numberToSpanishOrdinal(num: number): string | null {
+  if (!Number.isInteger(num) || num < 1 || num > MAX_ORDINAL) return null;
+  if (num < 100) return ordinalUnderHundred(num);
+
+  const hundred = Math.floor(num / 100) * 100;
+  const rem = num % 100;
+  return rem === 0 ? ORDINAL_HUNDREDS[hundred] ?? '' : `${ORDINAL_HUNDREDS[hundred] ?? ''} ${ordinalUnderHundred(rem)}`;
+}
+
 export function numberToWordsEnglish(num: number): string {
   if (num === 0) return 'zero';
   if (num <= 19) return ['','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'][num] ?? '';

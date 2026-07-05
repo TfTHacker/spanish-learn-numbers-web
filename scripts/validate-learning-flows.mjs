@@ -46,6 +46,7 @@ function loadModule(relativePath) {
 
 const learning = loadModule('../src/utils/learning.ts');
 const ranges = loadModule('../src/utils/ranges.ts');
+const numbers = loadModule('../src/utils/numbers.ts');
 
 const {
   applyCramAgain,
@@ -55,6 +56,7 @@ const {
   restartCramSession,
 } = learning;
 const { validateCustomRanges } = ranges;
+const { numberToSpanishOrdinal } = numbers;
 
 function expectEqual(actual, expected, message) {
   assert.deepEqual(actual, expected, message);
@@ -133,6 +135,53 @@ function testRangeValidation() {
   assert.equal(validateCustomRanges('1000000000001').valid, false, 'Numbers over one trillion should be rejected');
 }
 
+function testOrdinalNumbers() {
+  const cases = {
+    1: 'primero',
+    2: 'segundo',
+    3: 'tercero',
+    9: 'noveno',
+    10: 'décimo',
+    11: 'décimo primero',
+    15: 'décimo quinto',
+    19: 'décimo noveno',
+    20: 'vigésimo',
+    21: 'vigésimo primero',
+    29: 'vigésimo noveno',
+    30: 'trigésimo',
+    42: 'cuadragésimo segundo',
+    50: 'quincuagésimo',
+    60: 'sexagésimo',
+    70: 'septuagésimo',
+    80: 'octogésimo',
+    90: 'nonagésimo',
+    99: 'nonagésimo noveno',
+    100: 'centésimo',
+    101: 'centésimo primero',
+    110: 'centésimo décimo',
+    111: 'centésimo décimo primero',
+    121: 'centésimo vigésimo primero',
+    200: 'ducentésimo',
+    300: 'tricentésimo',
+    400: 'cuadringentésimo',
+    500: 'quingentésimo',
+    600: 'sexcentésimo',
+    700: 'septingentésimo',
+    800: 'octingentésimo',
+    900: 'noningentésimo',
+    999: 'noningentésimo nonagésimo noveno',
+  };
+
+  for (const [input, expected] of Object.entries(cases)) {
+    assert.equal(numberToSpanishOrdinal(Number(input)), expected, `Ordinal of ${input} should be "${expected}"`);
+  }
+
+  assert.equal(numberToSpanishOrdinal(0), null, 'Ordinal is undefined for zero');
+  assert.equal(numberToSpanishOrdinal(1000), null, 'Ordinal is capped at 999');
+  assert.equal(numberToSpanishOrdinal(-1), null, 'Ordinal rejects negative numbers');
+  assert.equal(numberToSpanishOrdinal(1.5), null, 'Ordinal rejects non-integers');
+}
+
 testCramSessionBuild();
 testCramSessionShuffle();
 testCramAgain();
@@ -140,5 +189,6 @@ testCramGood();
 testCramRestartPreservesOrderMode();
 testListenLearnDisplayPhases();
 testRangeValidation();
+testOrdinalNumbers();
 
 console.log('Learning flow regression validation passed.');

@@ -682,7 +682,7 @@ button {
     font-size: 17px;
   }
 
-  .lsn-speed-btn {
+  .lsn-segmented-btn {
     padding: 5px 9px;
     font-size: 12px;
   }
@@ -751,15 +751,17 @@ input.lsn-input-lg {
   font-family: inherit;
 }
 
-.lsn-speed-control {
+/* Generic segmented control (used for playback speed, cardinal/ordinal, etc). */
+.lsn-segmented-row {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
   margin: 6px 0 14px;
+  flex-wrap: wrap;
 }
 
-.lsn-speed-label {
+.lsn-segmented-label {
   color: var(--text-muted);
   font-size: 12px;
   text-transform: uppercase;
@@ -767,7 +769,7 @@ input.lsn-input-lg {
   white-space: nowrap;
 }
 
-.lsn-speed-group {
+.lsn-segmented {
   display: inline-flex;
   border: 1px solid var(--border);
   border-radius: 999px;
@@ -775,7 +777,7 @@ input.lsn-input-lg {
   background: var(--background-primary);
 }
 
-.lsn-speed-btn {
+.lsn-segmented-btn {
   border: none;
   border-right: 1px solid var(--border);
   background: transparent;
@@ -786,14 +788,29 @@ input.lsn-input-lg {
   cursor: pointer;
 }
 
-.lsn-speed-btn:last-child {
+.lsn-segmented-btn:last-child {
   border-right: none;
 }
 
-.lsn-speed-btn-active {
+.lsn-segmented-btn-active {
   background: var(--interactive-accent);
   color: var(--text-on-accent);
   font-weight: 600;
+}
+
+.lsn-kbd-hint {
+  display: none;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 11px;
+  margin: 4px 0 0;
+}
+
+/* Only devices with a real keyboard/mouse benefit from knowing these exist. */
+@media (hover: hover) and (pointer: fine) {
+  .lsn-kbd-hint {
+    display: block;
+  }
 }
 
 .lsn-sample-btn {
