@@ -9,6 +9,8 @@
 //   (Google voices in Chrome, Microsoft neural voices in Edge, Apple voices
 //   on macOS/iOS, etc.).
 
+import { toast } from '../ui/toast';
+
 export interface SpeechHandle {
   done: Promise<void>;
   cancel: () => void;
@@ -26,6 +28,7 @@ const PLAYBACK_TIMEOUT_MS = 15000;
 
 let sharedAudio: HTMLAudioElement | null = null;
 let activeCancel: (() => void) | null = null;
+let googleFallbackNotified = false;
 
 export const RESOLVED_SPEECH: SpeechHandle = { done: Promise.resolve(), cancel: () => {} };
 
@@ -109,6 +112,10 @@ export function speak(text: string, voiceId: string): SpeechHandle {
       finish();
       return;
     }
+    if (!googleFallbackNotified) {
+      googleFallbackNotified = true;
+      toast('Google Translate voice unavailable — using a browser voice instead.');
+    }
     usingSynth = true;
     const lang = SYNTH_LANGS[voiceId] ?? voiceId;
     const utterance = new SpeechSynthesisUtterance(text);
@@ -125,7 +132,10 @@ export function speak(text: string, voiceId: string): SpeechHandle {
 
   activeCancel = cancel;
 
-  const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${voiceId}&client=gtx`;
+  // client=tw-ob is the variant that works from regular web pages; the
+  // client=gtx form the Obsidian plugin used is often rejected when the
+  // request carries a browser Referer header.
+  const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${voiceId}&client=tw-ob`;
   audio.pause();
   audio.src = url;
   audio.load();
