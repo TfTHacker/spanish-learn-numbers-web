@@ -18,6 +18,7 @@ export const FOCUSED_RANGE_PRESETS: FocusedRangePreset[] = [
   { id: 'twenties', label: '20s', description: '20 to 29', ranges: '20-29', compactLabel: '20-29' },
   { id: 'tens', label: '30s-90s', description: 'Decade patterns from 30 to 99', ranges: '30-99', compactLabel: '30-99' },
   { id: 'hundreds', label: 'Hundreds', description: '100 to 130', ranges: '100-130', compactLabel: '100-130' },
+  { id: 'years', label: 'Years', description: '1950 to 2029 — birth years, dates, "el año..."', ranges: '1950-2029', compactLabel: '1950-2029' },
   { id: 'thousands', label: 'Thousands', description: '1,000 to 10,000 plus 1,000-1,039', ranges: '1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 1000-1039', compactLabel: '1000 + 1001-1039' },
   { id: 'big', label: 'Big Numbers', description: '100,000, 1,000,000, and 1,000,000,000', ranges: '100000, 1000000, 1000000000', compactLabel: '100k / 1M / 1B' },
   { id: 'tricky', label: 'Tricky', description: 'Commonly confusing forms', ranges: Array.from(TRICKY_NUMBERS).join(', '), compactLabel: 'Tricky set' },
