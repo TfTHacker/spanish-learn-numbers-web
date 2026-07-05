@@ -8,15 +8,17 @@ import { SPEECH_RATE_OPTIONS } from '../types';
 
 export function speedControlMarkup(currentRate: number): string {
   return `
-    <div class="lsn-speed-control" role="group" aria-label="Playback speed">
+    <div class="lsn-speed-control">
       <span class="lsn-speed-label">Speed</span>
-      ${SPEECH_RATE_OPTIONS.map((option) => `
-        <button
-          type="button"
-          class="lsn-speed-btn ${option.value === currentRate ? 'lsn-speed-btn-active' : ''}"
-          data-speed="${option.value}"
-        >${option.label}</button>
-      `).join('')}
+      <div class="lsn-speed-group" role="group" aria-label="Playback speed">
+        ${SPEECH_RATE_OPTIONS.map((option) => `
+          <button
+            type="button"
+            class="lsn-speed-btn ${option.value === currentRate ? 'lsn-speed-btn-active' : ''}"
+            data-speed="${option.value}"
+          >${option.label}</button>
+        `).join('')}
+      </div>
     </div>
   `;
 }

@@ -483,8 +483,8 @@ export class ListenLearnPanel {
     this.container.innerHTML = `
       <div class="lsn-wrap">
         <div class="lsn-progress-header">
-          <span></span>
           <span id="ll-counter" class="lsn-text-muted">${state.currentIndex + 1} / ${state.numbers.length}</span>
+          <button id="ll-home" class="lsn-home-btn-text lsn-listen-home" aria-label="Home">${iconOnly(APP_ICONS.home)}</button>
         </div>
 
         <div class="lsn-progress-section">
@@ -524,7 +524,6 @@ export class ListenLearnPanel {
               title="Auto-repeat range ${state.autoRepeatRange ? 'on' : 'off'}"
             >${iconOnly(APP_ICONS.repeatRange)}</button>
           </div>
-          <button id="ll-home" class="lsn-home-btn-text" aria-label="Home">${iconOnly(APP_ICONS.home)}</button>
         </div>
       </div>
     `;
