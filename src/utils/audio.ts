@@ -1,15 +1,12 @@
-// Audio playback for spoken numbers.
+// Audio playback for spoken numbers, using the browser's built-in speech
+// synthesis (Web Speech API). Voices come from the user's platform: Google
+// voices in Chrome, Microsoft neural voices in Edge, Apple voices on
+// macOS/iOS, Android's Google TTS voices. All of them work offline.
 //
-// Two backends:
-// - Google Translate TTS via a shared <audio> element (same as the Obsidian
-//   plugin). Browsers may block that endpoint (referer checks, network
-//   policies), so on any playback error we fall back to the Web Speech API.
-// - Browser/device voices via the Web Speech API, selected explicitly with a
-//   "browser:<voiceURI>" voice id. These work offline and vary by platform
-//   (Google voices in Chrome, Microsoft neural voices in Edge, Apple voices
-//   on macOS/iOS, etc.).
-
-import { toast } from '../ui/toast';
+// Voice ids:
+// - 'auto'                → best available Spanish voice
+// - 'browser:<voiceURI>'  → a specific voice picked by the user
+// - a BCP-47-ish code ('es', 'es-MX', 'en') → best voice for that language
 
 export interface SpeechHandle {
   done: Promise<void>;
@@ -19,6 +16,7 @@ export interface SpeechHandle {
 export const BROWSER_VOICE_PREFIX = 'browser:';
 
 const SYNTH_LANGS: Record<string, string> = {
+  auto: 'es-ES',
   es: 'es-ES',
   'es-MX': 'es-MX',
   en: 'en-US',
@@ -26,12 +24,7 @@ const SYNTH_LANGS: Record<string, string> = {
 
 const PLAYBACK_TIMEOUT_MS = 15000;
 
-let sharedAudio: HTMLAudioElement | null = null;
 let activeCancel: (() => void) | null = null;
-let googleFallbackNotified = false;
-// Once a Google Translate request fails, skip the endpoint for the rest of
-// the session instead of paying the failed-request delay on every clip.
-let googleUnavailable = false;
 
 export const RESOLVED_SPEECH: SpeechHandle = { done: Promise.resolve(), cancel: () => {} };
 
@@ -78,92 +71,19 @@ function pickSynthVoice(lang: string): SpeechSynthesisVoice | null {
 export function speak(text: string, voiceId: string): SpeechHandle {
   stopSpeaking();
 
-  if (isBrowserVoiceId(voiceId)) {
-    return speakWithSynth(text, findBrowserVoice(voiceId), 'es-ES');
-  }
-
-  if (voiceId === 'auto') {
-    return speakWithSynth(text, pickSynthVoice('es-ES'), 'es-ES');
-  }
-
-  if (googleUnavailable) {
-    const lang = SYNTH_LANGS[voiceId] ?? voiceId;
-    return speakWithSynth(text, pickSynthVoice(lang), lang);
-  }
-
-  let settled = false;
-  let usingSynth = false;
-  let timeoutId: number | null = null;
-  let resolveDone!: () => void;
-  const done = new Promise<void>((resolve) => { resolveDone = resolve; });
-
-  const audio = sharedAudio ?? new Audio();
-  sharedAudio = audio;
-
-  const finish = () => {
-    if (settled) return;
-    settled = true;
-    audio.removeEventListener('ended', finish);
-    audio.removeEventListener('abort', finish);
-    audio.removeEventListener('error', onAudioError);
-    if (timeoutId !== null) window.clearTimeout(timeoutId);
-    if (activeCancel === cancel) activeCancel = null;
-    resolveDone();
-  };
-
-  const cancel = () => {
-    if (settled) return;
-    audio.pause();
-    if (usingSynth && synthAvailable()) window.speechSynthesis.cancel();
-    finish();
-  };
-
-  const fallbackToSynth = () => {
-    if (settled) return;
-    if (!synthAvailable()) {
-      finish();
-      return;
-    }
-    googleUnavailable = true;
-    if (!googleFallbackNotified) {
-      googleFallbackNotified = true;
-      toast('Google Translate voice unavailable — using a browser voice instead.');
-    }
-    usingSynth = true;
-    const lang = SYNTH_LANGS[voiceId] ?? voiceId;
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = lang;
-    const voice = pickSynthVoice(lang);
-    if (voice) utterance.voice = voice;
-    utterance.onend = finish;
-    utterance.onerror = finish;
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(utterance);
-  };
-
-  const onAudioError = () => fallbackToSynth();
-
-  activeCancel = cancel;
-
-  // client=tw-ob is the variant that works from regular web pages; the
-  // client=gtx form the Obsidian plugin used is often rejected when the
-  // request carries a browser Referer header.
-  const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${voiceId}&client=tw-ob`;
-  audio.pause();
-  audio.src = url;
-  audio.load();
-  audio.addEventListener('ended', finish);
-  audio.addEventListener('abort', finish);
-  audio.addEventListener('error', onAudioError);
-  timeoutId = window.setTimeout(finish, PLAYBACK_TIMEOUT_MS);
-  audio.play().catch(() => fallbackToSynth());
-
-  return { done, cancel };
-}
-
-function speakWithSynth(text: string, voice: SpeechSynthesisVoice | null, fallbackLang: string): SpeechHandle {
   if (!synthAvailable()) {
     return RESOLVED_SPEECH;
+  }
+
+  let voice: SpeechSynthesisVoice | null;
+  let lang: string;
+
+  if (isBrowserVoiceId(voiceId)) {
+    voice = findBrowserVoice(voiceId);
+    lang = voice?.lang ?? 'es-ES';
+  } else {
+    lang = SYNTH_LANGS[voiceId] ?? voiceId;
+    voice = pickSynthVoice(lang);
   }
 
   let settled = false;
@@ -188,14 +108,8 @@ function speakWithSynth(text: string, voice: SpeechSynthesisVoice | null, fallba
   activeCancel = cancel;
 
   const utterance = new SpeechSynthesisUtterance(text);
-  if (voice) {
-    utterance.voice = voice;
-    utterance.lang = voice.lang;
-  } else {
-    utterance.lang = fallbackLang;
-    const picked = pickSynthVoice(fallbackLang);
-    if (picked) utterance.voice = picked;
-  }
+  utterance.lang = lang;
+  if (voice) utterance.voice = voice;
   utterance.onend = finish;
   utterance.onerror = finish;
   timeoutId = window.setTimeout(finish, PLAYBACK_TIMEOUT_MS);

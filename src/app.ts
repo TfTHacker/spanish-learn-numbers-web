@@ -77,11 +77,17 @@ export class App {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return defaults;
       const data = JSON.parse(raw);
-      return {
+      const settings: AppSettings = {
         ...defaults,
         ...data,
         listenLearnSettings: { ...defaults.listenLearnSettings, ...data.listenLearnSettings },
       };
+      // Settings saved before Google Translate TTS support was removed may
+      // reference its voice ids; map them to the automatic device voice.
+      if (settings.voiceId === 'es' || settings.voiceId === 'es-MX') {
+        settings.voiceId = 'auto';
+      }
+      return settings;
     } catch {
       return defaults;
     }

@@ -18,13 +18,7 @@ A guided audio slideshow. Choose Spanish → English, English → Spanish, or Sp
 Type any number from 0 to 1,000,000,000,000 and see it written in Spanish with a scale-by-scale breakdown, and hear it pronounced.
 
 ### Voices
-Choose your voice on the home screen. The picker shows where each voice comes from:
-
-- **Automatic (default)** — the best Spanish voice available on your device.
-- **This browser / device (offline)** — every Spanish voice installed on your system, which varies by platform: Microsoft neural voices in Edge (excellent quality), Google voices in Chrome, Apple voices on macOS/iOS, Android's Google TTS voices.
-- **Google Translate (online)** — the Spain and Mexico voices from Google Translate's unofficial TTS endpoint. Google blocks this endpoint in most browsers; if it fails, the app tells you and falls back to a browser voice automatically.
-
-Changing the voice plays a short preview so you can compare.
+Audio uses the speech voices built into your browser and device (the Web Speech API), so it works offline and costs nothing. The home-screen picker offers **Automatic** (the best Spanish voice on your device, the default) or any specific installed Spanish voice. What's available varies by platform: Microsoft neural voices in Edge (excellent quality), Google voices in Chrome, Apple voices on macOS/iOS, Android's Google TTS voices. Changing the voice plays a short preview so you can compare.
 
 ## Development
 

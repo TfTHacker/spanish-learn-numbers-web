@@ -1,7 +1,6 @@
 // Home Panel - Main entry point
 
 import { App } from '../app';
-import { VOICE_OPTIONS } from '../types';
 import { APP_ICONS, iconWithLabel } from '../ui/icons';
 import { browserVoiceId, getBrowserSpanishVoices, isBrowserVoiceId, onVoicesChanged } from '../utils/audio';
 import { escapeHtml } from '../utils/html';
@@ -50,14 +49,6 @@ export class HomePanel {
 
     const autoOption = `<option value="auto" ${selected === 'auto' ? 'selected' : ''}>Automatic — best Spanish voice on this device</option>`;
 
-    const googleGroup = `
-      <optgroup label="Google Translate (online — may not work in all browsers)">
-        ${VOICE_OPTIONS.map((voice) => `
-          <option value="${voice.id}" ${voice.id === selected ? 'selected' : ''}>${voice.name}</option>
-        `).join('')}
-      </optgroup>
-    `;
-
     const browserGroup = browserVoices.length > 0 ? `
       <optgroup label="This browser / device (offline)">
         ${browserVoices.map((voice) => {
@@ -73,7 +64,7 @@ export class HomePanel {
       ? `<option value="${escapeHtml(selected)}" selected>Saved browser voice</option>`
       : '';
 
-    return autoOption + browserGroup + googleGroup + missingSelected;
+    return autoOption + browserGroup + missingSelected;
   }
 
   render() {
