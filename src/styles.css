@@ -67,7 +67,7 @@ button {
 
 .lsn-wrap {
   width: 100%;
-  max-width: 700px;
+  max-width: 640px;
   min-width: 280px;
   margin: 0 auto;
   padding: 16px;
@@ -78,20 +78,20 @@ button {
 .lsn-card-sm {
   background: var(--background-secondary);
   border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 24px;
+  padding: 16px;
+  margin-bottom: 16px;
 }
 
 .lsn-title-lg {
-  font-size: 32px;
+  font-size: 26px;
   font-weight: bold;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
   margin-top: 0;
 }
 
 .lsn-subtitle {
   color: var(--text-muted);
-  margin-bottom: 24px;
+  margin-bottom: 14px;
 }
 
 .lsn-text-muted {
@@ -105,24 +105,25 @@ button {
 
 .lsn-label {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 5px;
   font-weight: 500;
 }
 
 .lsn-example {
   font-size: 12px;
   color: var(--text-muted);
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .lsn-home-btn-text {
   background: transparent;
   border: none;
   color: var(--text-muted);
-  padding: 16px;
+  padding: 10px 12px;
   cursor: pointer;
-  margin-top: 12px;
-  font-size: 18px;
+  margin-top: 0;
+  font-size: 16px;
+  min-height: 40px;
 }
 
 /* ===========================
@@ -134,8 +135,8 @@ button {
   color: white;
   border: none;
   border-radius: 12px;
-  padding: 16px;
-  font-size: 16px;
+  padding: 13px;
+  font-size: 15px;
   cursor: pointer;
   font-weight: bold;
 }
@@ -145,8 +146,8 @@ button {
   color: white;
   border: none;
   border-radius: 12px;
-  padding: 16px;
-  font-size: 16px;
+  padding: 13px;
+  font-size: 15px;
   cursor: pointer;
   font-weight: bold;
 }
@@ -156,8 +157,8 @@ button {
   color: white;
   border: none;
   border-radius: 12px;
-  padding: 16px;
-  font-size: 16px;
+  padding: 13px;
+  font-size: 15px;
   cursor: pointer;
   font-weight: bold;
 }
@@ -167,8 +168,8 @@ button {
   color: white;
   border: none;
   border-radius: 12px;
-  padding: 16px;
-  font-size: 16px;
+  padding: 13px;
+  font-size: 15px;
   cursor: pointer;
   font-weight: bold;
 }
@@ -178,8 +179,8 @@ button {
   color: white;
   border: none;
   border-radius: 8px;
-  padding: 16px;
-  font-size: 16px;
+  padding: 13px;
+  font-size: 15px;
   cursor: pointer;
 }
 
@@ -195,11 +196,13 @@ button {
 
 .lsn-btn-order {
   flex: 1;
-  padding: 12px;
+  min-height: 40px;
+  padding: 8px 10px;
   border-radius: 8px;
   border: 2px solid var(--border);
   background: var(--background-primary);
   cursor: pointer;
+  font-size: 14px;
   transition: all 0.15s ease;
 }
 
@@ -212,12 +215,14 @@ button {
 
 .lsn-direction-btn {
   flex: 1;
-  min-width: 120px;
-  padding: 12px;
+  min-width: 100px;
+  min-height: 40px;
+  padding: 8px 10px;
   border-radius: 8px;
   border: 2px solid var(--border);
   background: var(--background-primary);
   cursor: pointer;
+  font-size: 14px;
   transition: all 0.15s ease;
   color: var(--text);
 }
@@ -233,8 +238,8 @@ button {
   background: var(--background-secondary);
   border: none;
   border-radius: 8px;
-  padding: 12px 16px;
-  font-size: 20px;
+  padding: 10px 14px;
+  font-size: 18px;
   cursor: pointer;
 }
 
@@ -242,8 +247,8 @@ button {
   background: transparent;
   border: none;
   cursor: pointer;
-  font-size: 24px;
-  margin-top: 12px;
+  font-size: 22px;
+  margin-top: 8px;
 }
 
 .lsn-btn-start {
@@ -251,11 +256,11 @@ button {
   color: white;
   border: none;
   border-radius: 8px;
-  padding: 16px;
-  font-size: 18px;
+  padding: 13px;
+  font-size: 16px;
   cursor: pointer;
   width: 100%;
-  margin-top: 24px;
+  margin-top: 14px;
 }
 
 .lsn-btn-grid {
@@ -310,7 +315,7 @@ button {
 .lsn-preset-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 10px;
+  gap: 8px;
 }
 
 .lsn-preset-btn {
@@ -332,15 +337,16 @@ button {
 }
 
 .lsn-preset-grid-compact {
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
 }
 
 .lsn-preset-btn-compact {
   min-height: 0;
-  padding: 10px 12px;
+  padding: 8px 10px;
   gap: 0;
   align-items: center;
   text-align: center;
+  min-height: 40px;
 }
 
 .lsn-preset-range {
@@ -599,6 +605,88 @@ button {
     font-size: 16px;
     border-radius: 12px;
   }
+
+  /* Applies to every page's wrapper/card/heading, not just Listen & Learn */
+  .lsn-wrap {
+    padding: 12px;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  }
+
+  .lsn-card-sm {
+    padding: 12px;
+    margin-bottom: 12px;
+    border-radius: 12px;
+  }
+
+  .lsn-title-lg {
+    font-size: 22px;
+    margin-bottom: 8px;
+  }
+
+  .lsn-question-box-sm {
+    padding: 18px;
+    margin-bottom: 10px;
+  }
+
+  .lsn-cram-question-box,
+  .lsn-cram-answer-box {
+    min-height: 120px;
+  }
+
+  .lsn-question-text {
+    font-size: 32px;
+  }
+
+  .lsn-answer-text {
+    font-size: 24px;
+  }
+
+  .lsn-slideshow-card {
+    padding: 16px;
+    min-height: 140px;
+  }
+
+  .lsn-slideshow-num {
+    font-size: 32px;
+  }
+
+  .lsn-slideshow-first,
+  .lsn-slideshow-second {
+    font-size: 24px;
+  }
+
+  .lsn-number-to-spanish-result {
+    padding: 16px;
+    min-height: 90px;
+  }
+
+  .lsn-input-lg {
+    padding: 11px;
+    font-size: 19px;
+  }
+
+  .lsn-dashboard-btn {
+    min-height: 50px;
+  }
+
+  .lsn-celebration {
+    font-size: 40px;
+  }
+}
+
+@media (max-width: 380px) {
+  .lsn-question-text {
+    font-size: 26px;
+  }
+
+  .lsn-input-lg {
+    font-size: 17px;
+  }
+
+  .lsn-speed-btn {
+    padding: 5px 9px;
+    font-size: 12px;
+  }
 }
 
 @media (max-width: 390px) {
@@ -614,7 +702,7 @@ button {
 
 .lsn-input {
   width: 100%;
-  padding: 12px;
+  padding: 10px;
   border-radius: 8px;
   border: 1px solid var(--border);
   font-size: 14px;
@@ -624,18 +712,18 @@ button {
 }
 
 select.lsn-input {
-  min-height: 44px;
+  min-height: 42px;
   line-height: 1.4;
-  padding-top: 10px;
-  padding-bottom: 10px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
 .lsn-input-lg {
   width: 100%;
-  padding: 16px;
+  padding: 13px;
   border-radius: 8px;
   border: 1px solid var(--border);
-  font-size: 24px;
+  font-size: 22px;
   background: var(--background-primary);
   color: var(--text);
   box-sizing: border-box;
@@ -652,8 +740,8 @@ input.lsn-input-lg {
 
 .lsn-textarea {
   width: 100%;
-  height: 80px;
-  padding: 12px;
+  height: 64px;
+  padding: 10px;
   border-radius: 8px;
   border: 1px solid var(--border);
   font-size: 14px;
@@ -714,14 +802,14 @@ input.lsn-input-lg {
 .lsn-question-box-sm {
   background: var(--background-secondary);
   border-radius: 16px;
-  padding: 48px;
+  padding: 28px;
   text-align: center;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .lsn-cram-question-box,
 .lsn-cram-answer-box {
-  min-height: 196px;
+  min-height: 150px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -745,7 +833,7 @@ input.lsn-input-lg {
 
 .lsn-cram-controls {
   position: relative;
-  min-height: 56px;
+  min-height: 48px;
 }
 
 .lsn-cram-primary-action,
@@ -768,13 +856,13 @@ input.lsn-input-lg {
 }
 
 .lsn-question-text {
-  font-size: 48px;
+  font-size: 40px;
   font-weight: bold;
   word-break: break-all;
 }
 
 .lsn-answer-text {
-  font-size: 32px;
+  font-size: 28px;
   font-weight: bold;
   color: #27ae60;
   word-break: break-word;
@@ -787,12 +875,12 @@ input.lsn-input-lg {
 .lsn-home-actions {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 12px;
+  gap: 10px;
 }
 
 .lsn-dashboard-btn {
   width: 100%;
-  min-height: 72px;
+  min-height: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -861,11 +949,11 @@ input.lsn-input-lg {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 
 .lsn-progress-section {
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 
 .lsn-progress-label {
@@ -881,34 +969,34 @@ input.lsn-input-lg {
 .lsn-slideshow-card {
   background: var(--background-secondary);
   border-radius: 12px;
-  padding: 32px;
+  padding: 24px;
   text-align: center;
-  min-height: 200px;
+  min-height: 170px;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
 .lsn-slideshow-num {
-  font-size: 48px;
+  font-size: 40px;
   font-weight: bold;
   color: var(--text);
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   word-break: break-all;
 }
 
 .lsn-slideshow-first {
-  font-size: 36px;
+  font-size: 30px;
   font-weight: bold;
   color: #27ae60;
   word-break: break-word;
 }
 
 .lsn-slideshow-second {
-  font-size: 36px;
+  font-size: 30px;
   font-weight: bold;
   color: #e74c3c;
-  margin-top: 8px;
+  margin-top: 6px;
   word-break: break-word;
 }
 
@@ -921,7 +1009,7 @@ input.lsn-input-lg {
   display: flex;
   justify-content: center;
   gap: 8px;
-  margin-top: 16px;
+  margin-top: 10px;
 }
 
 .lsn-autorepeat-btn {
@@ -939,12 +1027,16 @@ input.lsn-input-lg {
 .lsn-footer-actions {
   display: flex;
   justify-content: space-between;
-  margin-top: 16px;
+  align-items: center;
+  margin-top: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .lsn-footer-actions-left {
   display: flex;
-  gap: 16px;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 /* ===========================
@@ -954,10 +1046,10 @@ input.lsn-input-lg {
 .lsn-number-to-spanish-result {
   background: var(--background-secondary);
   border-radius: 16px;
-  padding: 32px;
+  padding: 22px;
   text-align: center;
   word-wrap: break-word;
-  min-height: 152px;
+  min-height: 110px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -968,8 +1060,8 @@ input.lsn-input-lg {
 .lsn-number-to-spanish-stage {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-top: 16px;
+  gap: 10px;
+  margin-top: 10px;
 }
 
 .lsn-number-to-spanish-result-pending .lsn-number-to-spanish-text {
@@ -977,7 +1069,7 @@ input.lsn-input-lg {
 }
 
 .lsn-number-to-spanish-controls {
-  min-height: 56px;
+  min-height: 44px;
   display: flex;
   justify-content: center;
 }
@@ -1103,8 +1195,8 @@ input.lsn-input-lg {
    =========================== */
 
 .lsn-celebration {
-  font-size: 64px;
-  margin-bottom: 24px;
+  font-size: 48px;
+  margin-bottom: 14px;
 }
 
 /* ===========================
@@ -1120,19 +1212,19 @@ input.lsn-input-lg {
 }
 
 .lsn-mb-12 {
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .lsn-mb-16 {
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 
 .lsn-mb-24 {
-  margin-bottom: 24px;
+  margin-bottom: 14px;
 }
 
 .lsn-mt-16 {
-  margin-top: 16px;
+  margin-top: 10px;
 }
 
 .lsn-word-break {
