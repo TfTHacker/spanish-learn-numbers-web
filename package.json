@@ -1,0 +1,20 @@
+{
+  "name": "spanish-learn-numbers-web",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Learn Spanish numbers from 0 to 1 trillion with flashcards, listening practice, and audio.",
+  "type": "module",
+  "author": "TfTHacker",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run check && vite build",
+    "preview": "vite preview",
+    "check": "node scripts/validate-numbers.mjs && node scripts/validate-learning-flows.mjs && tsc --noEmit",
+    "test": "npm run check"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0",
+    "vite": "^6.0.0"
+  }
+}
