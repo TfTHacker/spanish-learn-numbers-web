@@ -118,6 +118,22 @@ export const MAX_ORDINAL = 999;
 
 const ORDINAL_UNITS = ['', 'primero', 'segundo', 'tercero', 'cuarto', 'quinto', 'sexto', 'séptimo', 'octavo', 'noveno'];
 
+// 11th-19th have their own RAE-preferred forms rather than being composed as
+// "décimo" + unit: undécimo/duodécimo, then fused single words. Note the
+// dropped accent (decimotercero, not décimotercero), the merged double vowel
+// in decimoctavo, and that decimoséptimo keeps séptimo's accent.
+const ORDINAL_TEENS: Record<number, string> = {
+  11: 'undécimo',
+  12: 'duodécimo',
+  13: 'decimotercero',
+  14: 'decimocuarto',
+  15: 'decimoquinto',
+  16: 'decimosexto',
+  17: 'decimoséptimo',
+  18: 'decimoctavo',
+  19: 'decimonoveno',
+};
+
 const ORDINAL_TENS: Record<number, string> = {
   10: 'décimo',
   20: 'vigésimo',
@@ -144,6 +160,8 @@ const ORDINAL_HUNDREDS: Record<number, string> = {
 
 function ordinalUnderHundred(num: number): string {
   if (num <= 9) return ORDINAL_UNITS[num] ?? '';
+  if (num === 10) return ORDINAL_TENS[10] ?? '';
+  if (num <= 19) return ORDINAL_TEENS[num] ?? '';
   if (num % 10 === 0) return ORDINAL_TENS[num] ?? '';
   const tens = Math.floor(num / 10) * 10;
   const units = num % 10;
