@@ -4,6 +4,9 @@ Audit date: 2026-07-05. Every conversion function was executed against a battery
 linguistically tricky values (apocopation, cien/ciento, mil/millón/millones scale words,
 long-scale vs short-scale pairing, ordinal composition) and compared against RAE norms.
 
+**Update:** Fixes 1 and 2 (ordinals 11-19) were implemented and verified — see
+"Fix 1" and "Fix 2" below, both now marked done.
+
 ## Verdict summary
 
 | Area | File | Status |
@@ -12,7 +15,7 @@ long-scale vs short-scale pairing, ordinal composition) and compared against RAE
 | English words (`numberToWordsEnglish`) | `src/utils/numbers.ts` | ✅ Correct — no changes needed |
 | Breakdown (`getSpanishNumberBreakdown`) | `src/utils/numbers.ts` | ✅ Correct — joins exactly match full forms |
 | ES↔EN pairing in Listen & Learn | `src/panels/listen-learn.ts` | ✅ Correct — long/short scale handled right |
-| Spanish ordinals (`numberToSpanishOrdinal`) | `src/utils/numbers.ts` | ⚠️ **Fix required — items 1 and 2 below** |
+| Spanish ordinals (`numberToSpanishOrdinal`) | `src/utils/numbers.ts` | ✅ **Fixed** — see Fix 1/2 below |
 
 Verified-correct cardinal spot checks (do not change): 16 → dieciséis, 22 → veintidós,
 21.000 → veintiún mil, 31.000 → treinta y un mil, 101.000 → ciento un mil,
@@ -23,7 +26,7 @@ Verified-correct cardinal spot checks (do not change): 16 → dieciséis, 22 →
 
 ---
 
-## FIX 1 (required): Ordinals 11–19 use non-preferred forms
+## FIX 1 — ✅ DONE: Ordinals 11–19 use non-preferred forms
 
 **File:** `src/utils/numbers.ts` — `ORDINAL_UNITS` (line ~119), `ordinalUnderHundred()` (line ~145)
 
@@ -62,7 +65,7 @@ Implementation notes for the fixer:
 - This automatically fixes compositions above 100, e.g. 111 → `centésimo undécimo`
   (currently `centésimo décimo primero`), 218 → `ducentésimo decimoctavo`.
 
-## FIX 2 (required, same change set): Update ordinal regression tests
+## FIX 2 — ✅ DONE: Update ordinal regression tests
 
 **File:** `scripts/validate-learning-flows.mjs` — `testOrdinalNumbers()` (line ~138)
 
